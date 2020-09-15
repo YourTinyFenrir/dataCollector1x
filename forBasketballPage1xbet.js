@@ -4,23 +4,9 @@
 // @author YourTinyFenrir
 // @license MIT
 // @version 0.1
+// @require https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js
 // @include https://bet-1x*.com/ru/line/Basketball/*
 // ==/UserScript==
-
-/*
-
-Победа в матче
-   "Победа в матче. с ОТ"
-Победа в четверти
-   "1Х2. 1-я Четверть"
-Инд. тотал в матче
-   "Индивидуальный тотал 1-го. с ОТ"
-   "Индивидуальный тотал 2-го. с ОТ"
-Инд. тотал в четверти
-   "Индивидуальный тотал 1-го. 1-я Четверть"
-   "Индивидуальный тотал 2-го. 1-я Четверть"
-
-*/
 
 function isReady(expressionFunction, completionFunction) {
    console.log("isReady(" + expressionFunction + ", " + completionFunction + ");");
@@ -91,50 +77,46 @@ function collectData(listOfMatches) {
                     window.close();
                 }
             }
-            else if (curSubgame < numOfSubgame && curSubgame < 4) {
-
-                alert("Subgame " + curSubgame + "/" + numOfSubgame);
-                isReady(() => document.getElementsByClassName("subgames")[0] != undefined, () => { // ???
-                    isReady(() => document.getElementsByClassName("subgames")[0].children[curSubgame] != undefined, () => { // ???
-                        console.log("complete");
-                        str = document.getElementsByClassName("subgames")[0].children[curSubgame].children[1].innerText;
-                        console.log("complete2");
-                        re = /.-я Четверть/;
-                        found = str.match(re);
-                        if (found != null) {
-                            let numOfBets = document.getElementsByClassName("bet_group").length;
-                            for (let i = 0; i < numOfBets; ++i) {
-                                isReady(() => document.getElementsByClassName("bet_group")[i].children != undefined, () => {
-                                    str = document.getElementsByClassName("bet_group")[i].children[0].innerText;
-                                    re = /Индивидуальный тотал .-го. с ОТ/;
-                                    found = str.match(re);
-                                    let re2 = /1Х2. .-я Четверть/;
-                                    let found2 = str.match(re2);
-                                    if (found != null || found2 != null) {
-                                        let bet = {
-                                            betName: document.getElementsByClassName("bet_group")[i].children[0].innerText,
-                                            koefs: document.getElementsByClassName("bet_group")[i].children[1].innerText,
-                                        };
-                                        match.bets.push(bet);
-                                    }
-                                });
-                            }
-                        }
-                    });
-                });
-                curSubgame++;
-                localStorage.setItem("currentSubgame", curSubgame);
-                str = document.getElementsByClassName("subgames")[0].children[curSubgame].children[1].href;
-                openWindow = window.open(str);
-                isReady(() => openWindow.closed, () => { window.close(); } );
-            }
             else {
-                localStorage.setItem("state", 1);
-                localStorage.setItem("currentSubgame", -1);
-                listOfMatches.push(match);
-                window.close();
+                alert("Subgame " + curSubgame + "/" + numOfSubgame);
+                isReady(() => document.getElementsByClassName("subgames")[0].children[curSubgame] != undefined, () => {
+                    str = document.getElementsByClassName("subgames")[0].children[curSubgame].children[1].innerText;
+                    re = /.-я Четверть/;
+                    found = str.match(re);
+                    if (found != null) {
+                        let numOfBets = document.getElementsByClassName("bet_group").length;
+                        for (let i = 0; i < numOfBets; ++i) {
+                             isReady(() => document.getElementsByClassName("bet_group")[i].children != undefined, () => {
+                                 str = document.getElementsByClassName("bet_group")[i].children[0].innerText;
+                                 re = /Индивидуальный тотал .-го. с ОТ/;
+                                 found = str.match(re);
+                                 let re2 = /1Х2. .-я Четверть/;
+                                 let found2 = str.match(re2);
+                                 if (found != null || found2 != null) {
+                                     let bet = {
+                                         betName: document.getElementsByClassName("bet_group")[i].children[0].innerText,
+                                         koefs: document.getElementsByClassName("bet_group")[i].children[1].innerText,
+                                     };
+                                     match.bets.push(bet);
+                                 }
+                             });
+                         }
+                    }
+                    if (curSubgame < numOfSubgame - 1 && curSubgame < 3) {
+                        curSubgame++;
+                        localStorage.setItem("currentSubgame", curSubgame);
+                        str = document.getElementsByClassName("subgames")[0].children[curSubgame].children[1].href;
+                        openWindow = window.open(str);
+                        isReady(() => openWindow.closed, () => { window.close(); } );
+                    }
+                    else {
+                        localStorage.setItem("state", 1);
+                        localStorage.setItem("currentSubgame", -1);
+                        listOfMatches.push(match);
+                        window.close();
+                    }
+                });
             }
-
         });
     });
 }
@@ -191,7 +173,6 @@ function openLeagueWindow(listOfMatches) {
     });
 
 }
-
 
 let st = localStorage.getItem("state");
 let listOfMatches = new Array();
