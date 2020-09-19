@@ -4,7 +4,7 @@
 // @author YourTinyFenrir
 // @license MIT
 // @version 1.0
-// @include https://bet-1x*.com/ru/
+// @include https://1x-bet*.com/ru/
 // ==/UserScript==
 
 function isReady(expressionFunction, completionFunction) {
@@ -17,16 +17,9 @@ function isReady(expressionFunction, completionFunction) {
 
 isReady(() => document.getElementsByClassName("link")[0] != undefined, () => {
 
-    let isEnd = false;
-    for (let i = 0; !isEnd; ++i) {
-        console.log(i + " - " + document.getElementsByClassName("link")[i].children[1].innerText);
-        if (document.getElementsByClassName("link")[i].children[1].innerText == "Баскетбол") {
-            let str = document.getElementsByClassName("link")[i].href;
-            window.open(str);
-            console.log("Basketball page is opened");
-            isEnd = true;
-        }
-    }
+    let str = window.location.href;
+    let openWindow = window.open(str + "line/Basketball/");
+    isReady(() => openWindow.closed, () => { window.close(); } );
 
     // variables for script "forBasketballPage1xbet"
     localStorage.setItem("currentLeague", 0);
@@ -36,5 +29,8 @@ isReady(() => document.getElementsByClassName("link")[0] != undefined, () => {
     localStorage.setItem("state", 0); // 0 - OpenLeagueWindow, 1 - openMatchWindow, 2 - collectData
     localStorage.setItem("date", 0);
     localStorage.setItem("name", 0);
+
+    localStorage.setItem("match", 0);
+    localStorage.setItem("listOfMatches", 0);
 
 });
